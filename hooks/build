@@ -1,0 +1,25 @@
+#!/bin/bash -x
+
+ETCDVERSION=3.0.17
+K8SVERSION=v1.8.5
+REPOREVISION=1.8.5
+
+function repo2repo {
+  docker pull gcr.io/google-containers/"$1":"$2"
+  docker tag gcr.io/google-containers/"$1":"$2" localhost:5000/k8s-$REPOREVISION/"$1":"$2"
+  docker push localhost:5000/k8s-$REPOREVISION/"$1":"$2"
+}
+
+git clone https://github.com/kfox1111/hubbuildtools
+
+hubbuildtools/hubhookhelpers/quinesetup
+
+repo2repo etcd-amd64 $ETCDVERSION
+
+repo2repo kube-proxy-amd64 $K8SVERSION
+repo2repo kube-apiserver-amd64 $K8SVERSION
+repo2repo kube-controller-manager-amd64 $K8SVERSION
+repo2repo kube-scheduler-amd64 $K8SVERSION
+
+hubbuildtools/hubhookhelpers/quinebuild
+
