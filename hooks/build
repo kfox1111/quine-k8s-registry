@@ -3,6 +3,7 @@
 ETCDVERSION=3.0.17
 K8SVERSION=v1.8.5
 REPOREVISION=1.8.5
+PAUSEVERSION=3.0
 
 function repo2repo {
   docker pull gcr.io/google-containers/"$1":"$2"
@@ -20,6 +21,7 @@ repo2repo kube-proxy-amd64 $K8SVERSION
 repo2repo kube-apiserver-amd64 $K8SVERSION
 repo2repo kube-controller-manager-amd64 $K8SVERSION
 repo2repo kube-scheduler-amd64 $K8SVERSION
+repo2repo pause-amd64 $PAUSEVERSION
 
 hubbuildtools/hubhookhelpers/quinebuild
 
