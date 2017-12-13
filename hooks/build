@@ -1,14 +1,18 @@
 #!/bin/bash -x
 
-ETCDVERSION=3.0.17
-K8SVERSION=v1.8.5
 REPOREVISION=1.8.5
-PAUSEVERSION=3.0
-KUBEDNSVERSION=1.14.5
+
+ETCD_VERSION=3.0.17
+K8S_VERSION=v1.8.5
+PAUSE_VERSION=3.0
+KUBEDNS_VERSION=1.14.5
+CALICO_NODE_VERSION=v2.6.2
+CALICO_CNI_VERSION=v1.11.0
+FLANNEL_VERSION=v0.9.1
 
 function repo2repo {
-  docker pull gcr.io/google-containers/"$1":"$2"
-  docker tag gcr.io/google-containers/"$1":"$2" localhost:5000/k8s-$REPOREVISION/"$1":"$2"
+  docker pull $REPO/"$1":"$2"
+  docker tag $REPO/"$1":"$2" localhost:5000/k8s-$REPOREVISION/"$1":"$2"
   docker push localhost:5000/k8s-$REPOREVISION/"$1":"$2"
 }
 
@@ -16,16 +20,22 @@ git clone https://github.com/kfox1111/hubbuildtools
 
 hubbuildtools/hubhookhelpers/quinesetup
 
-repo2repo etcd-amd64 $ETCDVERSION
+export REPO=gcr.io/google-containers
 
-repo2repo kube-proxy-amd64 $K8SVERSION
-repo2repo kube-apiserver-amd64 $K8SVERSION
-repo2repo kube-controller-manager-amd64 $K8SVERSION
-repo2repo kube-scheduler-amd64 $K8SVERSION
-repo2repo pause-amd64 $PAUSEVERSION
-repo2repo k8s-dns-kube-dns-amd64 $KUBEDNSVERSION
-repo2repo k8s-dns-dnsmasq-nanny-amd64 $KUBEDNSVERSION
-repo2repo k8s-dns-sidecar-amd64 $KUBEDNSVERSION
+repo2repo etcd-amd64 $ETCD_VERSION
+
+repo2repo kube-proxy-amd64 $K8S_VERSION
+repo2repo kube-apiserver-amd64 $K8S_VERSION
+repo2repo kube-controller-manager-amd64 $K8S_VERSION
+repo2repo kube-scheduler-amd64 $K8S_VERSION
+repo2repo pause-amd64 $PAUSE_VERSION
+repo2repo k8s-dns-kube-dns-amd64 $KUBE_DNS_VERSION
+repo2repo k8s-dns-dnsmasq-nanny-amd64 $KUBE_DNS_VERSION
+repo2repo k8s-dns-sidecar-amd64 $KUBE_DNS_VERSION
+
+export REPO=quay.io
+repo2repo calico/node $CALICO_NODE_VERSION
+repo2repo calico/cni $CALICO_CNI_VERSION
+repo2repo coreos/flannel $FLANNEL_VERSION
 
 hubbuildtools/hubhookhelpers/quinebuild
-
