@@ -1,9 +1,16 @@
 #!/bin/bash -xe
 
-REPOREVISION=1.8.5
+git clone https://github.com/kfox1111/hubbuildtools
+
+hubbuildtools/hubhookhelpers/quinesetup
+
+PROVISION_K8S_VERSION=$(hubbuildtools/hubcurlrevision.sh kfox1111/provision-k8s-server centos7-latest)
+K8S_BASE_VERSION=$(echo $PROVISION_K8S_VERSION | sed 's/-[0-9]*$//')
+
+REPOREVISION=$K8S_BASE_VERSION
+K8S_VERSION=v$K8S_BASE_VERSION
 
 ETCD_VERSION=3.0.17
-K8S_VERSION=v1.8.5
 PAUSE_VERSION=3.0
 KUBE_DNS_VERSION=1.14.5
 CALICO_NODE_VERSION=v2.6.2
@@ -15,10 +22,6 @@ function repo2repo {
   docker tag $REPO/"$1":"$2" localhost:5000/k8s-$REPOREVISION/"$1":"$2"
   docker push localhost:5000/k8s-$REPOREVISION/"$1":"$2"
 }
-
-git clone https://github.com/kfox1111/hubbuildtools
-
-hubbuildtools/hubhookhelpers/quinesetup
 
 export REPO=gcr.io/google-containers
 
@@ -37,5 +40,8 @@ export REPO=quay.io
 repo2repo calico/node $CALICO_NODE_VERSION
 repo2repo calico/cni $CALICO_CNI_VERSION
 repo2repo coreos/flannel $FLANNEL_VERSION
+
+export REPO=kfox1111
+repo2repo provision-k8s-server $PROVISION_K8S_VERSION
 
 hubbuildtools/hubhookhelpers/quinebuild
